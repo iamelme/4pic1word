@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+
+	<style>
+		html,
+		body {
+			height: 100%;
+			margin: 0;
+			padding: 0;
+			background: #ffcebd;
+			background: -moz-linear-gradient(top, #ffcebd 0%, #ffdea5 100%);
+			background: -webkit-linear-gradient(top, #ffcebd 0%,#ffdea5 100%);
+			background: linear-gradient(to bottom, #ffcebd 0%,#ffdea5 100%);
+		}
+
+		* {
+			box-sizing: border-box;
+		}
+
+		.red {
+			background: red;
+		}
+
+		.btn {
+			display: inline-block;
+			cursor: pointer;
+		}
+
+		.btn-keys {
+			margin: 0 5px;
+			padding: 8px 12px;
+			border: 0;
+			background: #fff;
+			border-radius: 4px;
+		}	
+
+		.btn--main {
+			display: none;
+		}
+
+		.inputs {
+			width: 30px;
+			height: 30px;
+			margin: 0 3px;
+			border-radius: 4px;
+			border: 0;
+			box-shadow: 0 2px 5px rgba(0,0,0,.1);
+
+			text-align: center;
+		}
+
+		.image-holder img {
+			width: 50%;
+			border: 1px solid #fff;
+
+		}
+
+		.inputs:focus {
+			outline: none;
+		}
+
+		.game {
+			max-width: 450px;
+			margin: 0 auto;
+		}
+	</style>
+</head>
+<body>
+
+	<div class="wrapper">
+		<div class="game">
+			<div class="image-holder"></div>
+
+			<div class="input-container"></div>
+			
+
+			<div class="btn-holder">
+				<button class="btn btn--start">Start</button>
+				<button class="btn btn--main">Next</button>
+			</div>
+
+			<div class="keys-holder">
+				
+			</div>
+
+			<div class="timer"></div> 
+		</div>
+	</div>
+
+	<script>
+		'use strict';
+
+		let imageHolder = document.querySelector('.image-holder'),
+			inputContainer = document.querySelector('.input-container'),
+			keysHolder = document.querySelector('.keys-holder'),
+			mainBtn = document.querySelector('.btn--main'),
+			startBtn = document.querySelector('.btn--start'),
+			timer = document.querySelector('.timer'),
+			score = 0,
+			hasClick = false,
+			isPlay = false,
+			time = 0,
+			countStart = window.setInterval(function() {
+			  if(isPlay) {
+			    time++;
+			    timer.innerHTML = time;
+			  }
+			}, 1000),
+			currentIndex = 0,
+			choices = [
+				{ 	images:["bill1.jpg", "bill2.jpg"], answer:  "bill" },	
+				{ 	images:["date1.jpg", "date2.jpg"], answer:  "date" },	
+				{ 	images:["sign1.jpg", "sign2.jpg"], answer:  "sign" },	
+			];
+
+
+
+		startBtn.addEventListener('click', (e) => {
+			e.preventDefault();
+			isPlay = true;
+
+			if( isPlay === true){
+				startCount(time);
+				startBtn.style.display = "none";
+				mainBtn.style.display = "block";			
+			}
+		});
+
+
+
+		function shuffleArr(arr) {
+				for (var i = arr.length - 1; i > 0; i--) {
+		
+		        var j = Math.floor(Math.random() * (i + 1));
+		        var temp = arr[i];
+
+		        arr[i] = arr[j];	
+
+
+
+		        arr[j] = temp;
+		    }
+
+		    return arr;
+		}
+
+		choices = shuffleArr(choices);
+
+
+
+		function startCount() {
+
+			function showChoices() {
+
+
+				let answers = choices[currentIndex].answer.split(''),
+					rand = Math.floor(Math.random() * Math.floor(choices.length));
+
+				if(hasClick === true) {					
+					checkLetters(answers, rand);
+				} else {
+
+					let keyArr = [],
+						givenKeys = answers.length -1;
+
+					answers.forEach((e, idx) =>{
+						inputContainer.innerHTML += `<input type="text" maxlength="1" ${ rand == idx ? `value="${e}" disabled` : '' } class="inputs">`;
+
+						if(rand !== idx) {
+							keyArr.push(e);
+						}
+					});
+
+
+					for( var i = 0; i < 12 - givenKeys; i++ ) {
+						let startLetter = Math.floor(Math.random() * (122 - 97 + 1) + 97);
+						keyArr.push(String.fromCharCode(startLetter));
+					} 
+
+					keyArr = shuffleArr(keyArr);
+
+					keyArr.forEach((e, idx) => {
+						keysHolder.innerHTML += `<span class="btn btn-keys" data-keyvalue="${e}">${e}</span>`;
+					});
+
+					let keyBtns = document.querySelectorAll('.btn-keys');
+
+					keyBtns.forEach((x) => {
+
+						x.addEventListener('click', (e) => {
+
+							let c = e;
+							console.log(c);
+						});
+					});
+
+					choices[currentIndex].images.forEach((e, idx) =>{
+						imageHolder.innerHTML += `<img src="images/${e}">`;
+					});
+				}
+			}
+
+			
+
+
+
+			function checkLetters(answer, rand) {
+				let userInput = document.querySelectorAll('.inputs'),
+					counter = 0;
+
+				userInput.forEach((el, idx) =>{
+
+					if(el.value != answer[idx]) {
+						el.classList.add('red');
+					} else {
+						counter++;
+						el.classList.remove('red');
+					}
+
+
+					if(counter >= choices[currentIndex].answer.split('').length) {
+						counter = 0;
+						score++;
+
+						imageHolder.innerHTML = "";
+						inputContainer.innerHTML = "";
+
+						if(currentIndex < choices.length - 1) {
+
+							currentIndex++;
+
+							let answers = choices[currentIndex].answer.split(''),
+								images = choices[currentIndex].images,
+								rand = Math.floor(Math.random() * Math.floor(4));
+							
+
+							answers.forEach((e, idx) =>{
+								inputContainer.innerHTML += `<input type="text" maxlength="1" ${ rand == idx ? `value="${e}" disabled` : '' } class="inputs">`;
+							});
+
+
+							images.forEach((e, idx) =>{
+								imageHolder.innerHTML += `<img src="images/${e}">`;
+							});
+
+							if(currentIndex == choices.length - 1) {
+								mainBtn.innerHTML = "Submit";
+							} 
+						} else {
+							inputContainer.innerHTML = "Congratulation!"
+							mainBtn.style.display = 'none';		
+							isPlay = false;					
+						}
+					}
+				});
+			}
+
+			showChoices();
+
+			mainBtn.addEventListener('click', e => {
+				e.preventDefault();
+				hasClick = true;
+				showChoices();
+			});
+		}
+	</script>
+	
+</body>
+</html>
