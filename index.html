@@ -30,7 +30,8 @@
 		}
 
 		.btn-keys {
-			margin: 0 5px;
+			width: 30px;
+			margin: 5px;
 			padding: 8px 12px;
 			border: 0;
 			background: #fff;
@@ -64,6 +65,13 @@
 
 		.game {
 			max-width: 450px;
+			margin: 0 auto;
+		}
+
+		.keys-holder {
+			display: flex;
+			flex-wrap: wrap;
+			max-width: 240px;
 			margin: 0 auto;
 		}
 	</style>
@@ -136,11 +144,7 @@
 		
 		        var j = Math.floor(Math.random() * (i + 1));
 		        var temp = arr[i];
-
-		        arr[i] = arr[j];	
-
-
-
+		        arr[i] = arr[j];
 		        arr[j] = temp;
 		    }
 
@@ -153,8 +157,63 @@
 
 		function startCount() {
 
-			function showChoices() {
 
+			function addInput(ans, rand) {
+				let keyArr = [],
+					givenKeys = ans.length -1;
+
+				ans.forEach((e, idx) =>{
+					inputContainer.innerHTML += `<input type="text" maxlength="1" ${ rand == idx ? `value="${e}" disabled` : `value=""` } class="inputs">`;
+
+					if(rand !== idx) {
+						keyArr.push(e);
+					}
+				});
+
+
+				for( var i = 0; i < 12 - givenKeys; i++ ) {
+					let startLetter = Math.floor(Math.random() * (122 - 97 + 1) + 97);
+					keyArr.push(String.fromCharCode(startLetter));
+				} 
+
+				keyArr = shuffleArr(keyArr);
+
+				keyArr.forEach((e) => {
+					keysHolder.innerHTML += `<button class="btn btn-keys" data-keyvalue="${e}">${e}</button>`;			
+				});
+
+				let keyBtns = document.querySelectorAll('.btn-keys');
+
+				keyBtns.forEach((x) => {
+			
+					var obj = {
+					    handleEvent: function() {
+
+					    	let thisValue = this.elemVal,
+					    		mainInputs = document.querySelectorAll('.inputs');
+
+					        thisValue.style.background = 'yellow';
+
+					        
+					        for( var i = 0; i < mainInputs.length; i++) {
+
+					        	if(mainInputs[i].value == null || mainInputs[i].value == undefined || mainInputs[i].value == "") {
+					        		mainInputs[i].value = thisValue.innerHTML;		
+					        		thisValue.classList.toggle('inserted');	
+					        		thisValue.setAttribute('data-inputid', i);	
+					        		console.log(mainInputs[i].getBoundingClientRect().x);
+					        		break;			        		
+					        	}
+					        }
+					    },
+					    elemVal: x
+					};
+
+					x.addEventListener("click", obj, false);
+				});
+			}
+
+			function showChoices() {
 
 				let answers = choices[currentIndex].answer.split(''),
 					rand = Math.floor(Math.random() * Math.floor(choices.length));
@@ -163,48 +222,16 @@
 					checkLetters(answers, rand);
 				} else {
 
-					let keyArr = [],
-						givenKeys = answers.length -1;
-
-					answers.forEach((e, idx) =>{
-						inputContainer.innerHTML += `<input type="text" maxlength="1" ${ rand == idx ? `value="${e}" disabled` : '' } class="inputs">`;
-
-						if(rand !== idx) {
-							keyArr.push(e);
-						}
-					});
+					addInput(answers, rand);
 
 
-					for( var i = 0; i < 12 - givenKeys; i++ ) {
-						let startLetter = Math.floor(Math.random() * (122 - 97 + 1) + 97);
-						keyArr.push(String.fromCharCode(startLetter));
-					} 
-
-					keyArr = shuffleArr(keyArr);
-
-					keyArr.forEach((e, idx) => {
-						keysHolder.innerHTML += `<span class="btn btn-keys" data-keyvalue="${e}">${e}</span>`;
-					});
-
-					let keyBtns = document.querySelectorAll('.btn-keys');
-
-					keyBtns.forEach((x) => {
-
-						x.addEventListener('click', (e) => {
-
-							let c = e;
-							console.log(c);
-						});
-					});
 
 					choices[currentIndex].images.forEach((e, idx) =>{
 						imageHolder.innerHTML += `<img src="images/${e}">`;
 					});
+					
 				}
 			}
-
-			
-
 
 
 			function checkLetters(answer, rand) {
@@ -213,11 +240,8 @@
 
 				userInput.forEach((el, idx) =>{
 
-					if(el.value != answer[idx]) {
-						el.classList.add('red');
-					} else {
+					if(el.value == answer[idx]) {						
 						counter++;
-						el.classList.remove('red');
 					}
 
 
@@ -227,6 +251,9 @@
 
 						imageHolder.innerHTML = "";
 						inputContainer.innerHTML = "";
+						keysHolder.innerHTML = "";
+
+
 
 						if(currentIndex < choices.length - 1) {
 
@@ -235,11 +262,15 @@
 							let answers = choices[currentIndex].answer.split(''),
 								images = choices[currentIndex].images,
 								rand = Math.floor(Math.random() * Math.floor(4));
+
+
+
+								addInput(answers, rand); // dara
 							
 
-							answers.forEach((e, idx) =>{
-								inputContainer.innerHTML += `<input type="text" maxlength="1" ${ rand == idx ? `value="${e}" disabled` : '' } class="inputs">`;
-							});
+							// answers.forEach((e, idx) =>{
+							// 	inputContainer.innerHTML += `<input type="text" maxlength="1" ${ rand == idx ? `value="${e}" disabled` : '' } class="inputs">`;
+							// });
 
 
 							images.forEach((e, idx) =>{
