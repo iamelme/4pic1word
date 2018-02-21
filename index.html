@@ -30,13 +30,20 @@
 		}
 
 		.btn-keys {
+			position: relative;
 			width: 30px;
-			margin: 5px;
-			padding: 8px 12px;
+			height: 30px;			
+			padding: 8px 0;
 			border: 0;
 			background: #fff;
 			border-radius: 4px;
+
+			transition: all .5s;
 		}	
+
+		.btn-keys:focus {
+			outline: none;
+		}
 
 		.btn--main {
 			display: none;
@@ -63,7 +70,13 @@
 			outline: none;
 		}
 
+		.inserted {
+			position: fixed;
+			background: yellow;
+		}
+
 		.game {
+			position: relative;
 			max-width: 450px;
 			margin: 0 auto;
 		}
@@ -74,6 +87,26 @@
 			max-width: 240px;
 			margin: 0 auto;
 		}
+
+		.key-holder {
+			position: relative;
+			display: inline-block;
+			width: 30px;
+			height: 30px;
+			margin: 5px;
+			background: #ededed;
+			border-radius: 4px;
+		}
+
+		.inserted-disable {
+			background: #ededed;
+			cursor: default;
+		}
+
+		.hint-btn {
+			display: none;
+		}
+
 	</style>
 </head>
 <body>
@@ -95,6 +128,8 @@
 			</div>
 
 			<div class="timer"></div> 
+			<div class="score"></div>
+			<button class="hint-btn">Hint</button>
 		</div>
 	</div>
 
@@ -107,6 +142,8 @@
 			mainBtn = document.querySelector('.btn--main'),
 			startBtn = document.querySelector('.btn--start'),
 			timer = document.querySelector('.timer'),
+			scoreContainer = document.querySelector('.score'),
+			hintBtn = document.querySelector('.hint-btn'),
 			score = 0,
 			hasClick = false,
 			isPlay = false,
@@ -121,7 +158,7 @@
 			choices = [
 				{ 	images:["bill1.jpg", "bill2.jpg"], answer:  "bill" },	
 				{ 	images:["date1.jpg", "date2.jpg"], answer:  "date" },	
-				{ 	images:["sign1.jpg", "sign2.jpg"], answer:  "sign" },	
+				{ 	images:["sign1.jpg", "sign2.jpg"], answer:  "signs" },	
 			];
 
 
@@ -134,7 +171,9 @@
 				startCount(time);
 				startBtn.style.display = "none";
 				mainBtn.style.display = "block";			
+				hintBtn.style.display = "block";			
 			}
+
 		});
 
 
@@ -158,7 +197,9 @@
 		function startCount() {
 
 
-			function addInput(ans, rand) {
+	
+
+			function addInput(ans, rand, opt) {
 				let keyArr = [],
 					givenKeys = ans.length -1;
 
@@ -179,52 +220,82 @@
 				keyArr = shuffleArr(keyArr);
 
 				keyArr.forEach((e) => {
-					keysHolder.innerHTML += `<button class="btn btn-keys" data-keyvalue="${e}">${e}</button>`;			
+					keysHolder.innerHTML += `<span class="key-holder"><button class="btn btn-keys" data-keyvalue="${e}">${e}</button></span>`;			
 				});
 
 				let keyBtns = document.querySelectorAll('.btn-keys');
 
+
 				keyBtns.forEach((x) => {
-			
 					var obj = {
 					    handleEvent: function() {
 
-					    	let thisValue = this.elemVal,
+					    	let thisObj = this.elemVal,
 					    		mainInputs = document.querySelectorAll('.inputs');
 
-					        thisValue.style.background = 'yellow';
+					    	if(thisObj.classList.contains('inserted')) {
+					    		if(thisObj.getAttribute('data-inputid')) {
+					    			let whichInput = thisObj.getAttribute('data-inputid');
 
-					        
-					        for( var i = 0; i < mainInputs.length; i++) {
+				        			mainInputs[whichInput].value = '';
+				        			mainInputs[whichInput].innerHTML = '';
 
-					        	if(mainInputs[i].value == null || mainInputs[i].value == undefined || mainInputs[i].value == "") {
-					        		mainInputs[i].value = thisValue.innerHTML;		
-					        		thisValue.classList.toggle('inserted');	
-					        		thisValue.setAttribute('data-inputid', i);	
-					        		console.log(mainInputs[i].getBoundingClientRect().x);
-					        		break;			        		
-					        	}
-					        }
+
+									thisObj.style.left = `auto`;
+					        		thisObj.style.top = `auto`;	        			
+
+				        			thisObj.classList.remove('inserted');	
+					        		thisObj.setAttribute('data-inputid', '');
+					    		}
+					    	} else {
+
+					    		for( var i = 0; i < mainInputs.length; i++) {
+
+						        	let inputCoor = mainInputs[i].getBoundingClientRect(),
+						        		positionInput;
+
+						        	if(mainInputs[i].value == null || mainInputs[i].value == undefined || mainInputs[i].value == "") {
+						        		
+					        			mainInputs[i].value = thisObj.innerHTML;		
+					        			thisObj.classList.toggle('inserted');	
+					        			thisObj.setAttribute('data-inputid', i);	
+						        		
+
+						        		thisObj.style.left = `${inputCoor.left}px`;
+						        		thisObj.style.top = `${inputCoor.top}px`;
+
+				
+						        		break;			        		
+						        	}
+						        }
+					    	}
 					    },
 					    elemVal: x
 					};
 
 					x.addEventListener("click", obj, false);
-				});
+				});	
+
 			}
+
+
+
+
 
 			function showChoices() {
 
 				let answers = choices[currentIndex].answer.split(''),
 					rand = Math.floor(Math.random() * Math.floor(choices.length));
 
+					scoreContainer.innerHTML = `Youre score is ${score}`;
+
 				if(hasClick === true) {					
+
 					checkLetters(answers, rand);
+					scoreContainer.innerHTML = `Youre score is ${score}`;
 				} else {
 
 					addInput(answers, rand);
-
-
 
 					choices[currentIndex].images.forEach((e, idx) =>{
 						imageHolder.innerHTML += `<img src="images/${e}">`;
@@ -232,6 +303,8 @@
 					
 				}
 			}
+
+			
 
 
 			function checkLetters(answer, rand) {
@@ -247,7 +320,7 @@
 
 					if(counter >= choices[currentIndex].answer.split('').length) {
 						counter = 0;
-						score++;
+						score+=3;
 
 						imageHolder.innerHTML = "";
 						inputContainer.innerHTML = "";
@@ -283,7 +356,8 @@
 						} else {
 							inputContainer.innerHTML = "Congratulation!"
 							mainBtn.style.display = 'none';		
-							isPlay = false;					
+							hintBtn.style.display = 'none';		
+							isPlay = false;			
 						}
 					}
 				});
@@ -294,7 +368,65 @@
 			mainBtn.addEventListener('click', e => {
 				e.preventDefault();
 				hasClick = true;
+
+
+
+				hintBtn.addEventListener('click', (e) => {
+					e.preventDefault();
+					if (score >= 3) {
+						
+						scoreContainer.innerHTML = `Youre score is ${score}`;
+
+						
+						let answers = choices[currentIndex].answer.split(''),
+							keyBtns = document.querySelectorAll('.btn-keys'),
+							mainInputs = document.querySelectorAll('.inputs');
+
+
+						for(var i = 0; i < mainInputs.length; i++) {
+							if(mainInputs[i].value == null || mainInputs[i].value == undefined || mainInputs[i].value == "") {
+
+
+
+								for( var j = 0; j < keyBtns.length; j++) {
+
+									if(keyBtns[j].getAttribute('data-keyvalue') == answers[i]) {
+
+										let inputCoor = mainInputs[i].getBoundingClientRect();
+
+
+										keyBtns[j].classList.add('inserted', 'inserted-disable');
+
+										mainInputs[i].value = keyBtns[j].getAttribute('data-keyvalue');
+
+										keyBtns[j].style.top = `${inputCoor.top}px`;
+										keyBtns[j].style.left = `${inputCoor.left}px`;
+
+										score -= 3;
+
+										break;
+									}
+
+								}
+
+								break;
+
+							}
+						}
+
+						scoreContainer.innerHTML = `Youre score is ${score}`;
+		
+						
+
+					} else {
+						console.log('di pwede');
+					}
+				});
+
+				
 				showChoices();
+
+
 			});
 		}
 	</script>
