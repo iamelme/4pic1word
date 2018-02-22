@@ -1,0 +1,5 @@
+[
+	{ 	images:["bill1.jpg", "bill2.jpg"], answer:  "bill" },	
+	{ 	images:["date1.jpg", "date2.jpg"], answer:  "date" },	
+	{ 	images:["sign1.jpg", "sign2.jpg"], answer:  "signs" },	
+]
