@@ -137,7 +137,7 @@
 			</div>
 
 			<div class="timer"><span class="hours"></span><span class="minutes"></span><span class="seconds"></span></div> 
-			<div class="score"></div>
+			<div class="gold"></div>
 			<button class="hint-btn">Hint</button>
 		</div>
 	</div>
@@ -154,9 +154,9 @@
 			seconds = document.querySelector('.seconds'),
 			minutes = document.querySelector('.minutes'),
 			hours = document.querySelector('.hours'),
-			scoreContainer = document.querySelector('.score'),
+			goldContainer = document.querySelector('.gold'),
 			hintBtn = document.querySelector('.hint-btn'),
-			score = 0,
+			gold = 0,
 			hasClick = false,
 			isPlay = false,
 			second = 0,
@@ -322,12 +322,12 @@
 				let answers = choices[currentIndex].answer.split(''),
 					rand = Math.floor(Math.random() * Math.floor(choices.length));
 
-					scoreContainer.innerHTML = `Youre score is ${score}`;
+					goldContainer.innerHTML = `Youre gold is ${gold}`;
 
 				if(hasClick === true) {					
 
 					checkLetters(answers, rand);
-					scoreContainer.innerHTML = `Youre score is ${score}`;
+					goldContainer.innerHTML = `Youre gold is ${gold}`;
 				} else {
 
 					addInput(answers, rand);
@@ -355,7 +355,7 @@
 
 					if(counter >= choices[currentIndex].answer.split('').length) {
 						counter = 0;
-						score+=3;
+						gold+=3;
 
 						imageHolder.innerHTML = "";
 						inputContainer.innerHTML = "";
@@ -408,9 +408,9 @@
 			hintBtn.addEventListener('click', (e) => {
 				e.preventDefault();
 
-				if (score >= 3) {
+				if (gold >= 3) {
 					
-					scoreContainer.innerHTML = `Youre score is ${score}`;
+					goldContainer.innerHTML = `Youre gold is ${gold}`;
 
 					
 					let answers = choices[currentIndex].answer.split(''),
@@ -424,11 +424,11 @@
 
 							for( var j = 0; j < keyBtns.length; j++) {
 
-								if(keyBtns[j].getAttribute('data-keyvalue') == answers[i]) {
+								if(keyBtns[j].getAttribute('data-keyvalue') == answers[i] && keyBtns[j].classList.contains('inserted-disable') !== true) {
 
 									let inputCoor = mainInputs[i].getBoundingClientRect();
 
-									console.log('inside loop ' + keyBtns[j]);
+									console.log('inside loop ' + keyBtns[j].classList.contains('inserted-disable'));
 
 									keyBtns[j].classList.add('inserted', 'inserted-disable');
 
@@ -437,7 +437,7 @@
 									keyBtns[j].style.top = `${inputCoor.top}px`;
 									keyBtns[j].style.left = `${inputCoor.left}px`;
 
-									score -= 3;									
+									gold -= 3;									
 
 									break;
 								}
@@ -447,7 +447,7 @@
 						}
 					}
 
-					scoreContainer.innerHTML = `Youre score is ${score}`;
+					goldContainer.innerHTML = `Youre gold is ${gold}`;
 	
 					
 
