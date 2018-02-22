@@ -127,7 +127,7 @@
 				
 			</div>
 
-			<div class="timer"></div> 
+			<div class="timer"><span class="hours"></span><span class="minutes"></span><span class="seconds"></span></div> 
 			<div class="score"></div>
 			<button class="hint-btn">Hint</button>
 		</div>
@@ -142,6 +142,9 @@
 			mainBtn = document.querySelector('.btn--main'),
 			startBtn = document.querySelector('.btn--start'),
 			timer = document.querySelector('.timer'),
+			seconds = document.querySelector('.seconds'),
+			minutes = document.querySelector('.minutes'),
+			hours = document.querySelector('.hours'),
 			scoreContainer = document.querySelector('.score'),
 			hintBtn = document.querySelector('.hint-btn'),
 			score = 0,
@@ -151,11 +154,30 @@
 			countStart = window.setInterval(function() {
 			  if(isPlay) {
 			    time++;
-			    timer.innerHTML = time;
+			    seconds.innerHTML = time;
+
+			    if(time == 60) {
+			    	let minute = 0;
+			    	minute++;
+			    	time = 0;
+
+			    	minutes.innerHTML = minute;
+
+			    	if (minute == 60) {
+			    		let hour = 0;
+			    		hour++;
+			    		minute = 0;
+
+			    		hours.innerHTML = hour;
+
+			    	}
+			    }
+			    
 			  }
 			}, 1000),
 			currentIndex = 0,
 			choices = [
+				{ 	images:["bill1.jpg", "bill2.jpg"], answer:  "bill" },	
 				{ 	images:["bill1.jpg", "bill2.jpg"], answer:  "bill" },	
 				{ 	images:["date1.jpg", "date2.jpg"], answer:  "date" },	
 				{ 	images:["sign1.jpg", "sign2.jpg"], answer:  "signs" },	
@@ -327,7 +349,6 @@
 						keysHolder.innerHTML = "";
 
 
-
 						if(currentIndex < choices.length - 1) {
 
 							currentIndex++;
@@ -368,65 +389,58 @@
 			mainBtn.addEventListener('click', e => {
 				e.preventDefault();
 				hasClick = true;
-
-
-
-				hintBtn.addEventListener('click', (e) => {
-					e.preventDefault();
-					if (score >= 3) {
-						
-						scoreContainer.innerHTML = `Youre score is ${score}`;
-
-						
-						let answers = choices[currentIndex].answer.split(''),
-							keyBtns = document.querySelectorAll('.btn-keys'),
-							mainInputs = document.querySelectorAll('.inputs');
-
-
-						for(var i = 0; i < mainInputs.length; i++) {
-							if(mainInputs[i].value == null || mainInputs[i].value == undefined || mainInputs[i].value == "") {
-
-
-
-								for( var j = 0; j < keyBtns.length; j++) {
-
-									if(keyBtns[j].getAttribute('data-keyvalue') == answers[i]) {
-
-										let inputCoor = mainInputs[i].getBoundingClientRect();
-
-
-										keyBtns[j].classList.add('inserted', 'inserted-disable');
-
-										mainInputs[i].value = keyBtns[j].getAttribute('data-keyvalue');
-
-										keyBtns[j].style.top = `${inputCoor.top}px`;
-										keyBtns[j].style.left = `${inputCoor.left}px`;
-
-										score -= 3;
-
-										break;
-									}
-
-								}
-
-								break;
-
-							}
-						}
-
-						scoreContainer.innerHTML = `Youre score is ${score}`;
-		
-						
-
-					} else {
-						console.log('di pwede');
-					}
-				});
-
-				
 				showChoices();
+			});
+
+			hintBtn.addEventListener('click', (e) => {
+				e.preventDefault();
+
+				if (score >= 3) {
+					
+					scoreContainer.innerHTML = `Youre score is ${score}`;
+
+					
+					let answers = choices[currentIndex].answer.split(''),
+						keyBtns = document.querySelectorAll('.btn-keys'),
+						mainInputs = document.querySelectorAll('.inputs');
 
 
+					for(var i = 0; i < mainInputs.length; i++ ) {
+
+						if(mainInputs[i].value == null || mainInputs[i].value == undefined || mainInputs[i].value == "") {
+
+							for( var j = 0; j < keyBtns.length; j++) {
+
+								if(keyBtns[j].getAttribute('data-keyvalue') == answers[i]) {
+
+									let inputCoor = mainInputs[i].getBoundingClientRect();
+
+									console.log('inside loop ' + keyBtns[j]);
+
+									keyBtns[j].classList.add('inserted', 'inserted-disable');
+
+									mainInputs[i].value = keyBtns[j].getAttribute('data-keyvalue');
+
+									keyBtns[j].style.top = `${inputCoor.top}px`;
+									keyBtns[j].style.left = `${inputCoor.left}px`;
+
+									score -= 3;									
+
+									break;
+								}
+							}
+							console.log(i);
+							break;
+						}
+					}
+
+					scoreContainer.innerHTML = `Youre score is ${score}`;
+	
+					
+
+				} else {
+					console.log('di pwede');
+				}
 			});
 		}
 	</script>
