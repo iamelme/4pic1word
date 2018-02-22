@@ -156,7 +156,7 @@
 			hours = document.querySelector('.hours'),
 			goldContainer = document.querySelector('.gold'),
 			hintBtn = document.querySelector('.hint-btn'),
-			gold = 0,
+			gold = 9,
 			hasClick = false,
 			isPlay = false,
 			second = 0,
@@ -424,7 +424,7 @@
 
 							for( var j = 0; j < keyBtns.length; j++) {
 
-								if(keyBtns[j].getAttribute('data-keyvalue') == answers[i] && keyBtns[j].classList.contains('inserted-disable') !== true) {
+								if(keyBtns[j].getAttribute('data-keyvalue') == answers[i] && keyBtns[j].classList.contains('inserted-disable') !== true && keyBtns[j].classList.contains('inserted') !== true) {
 
 									let inputCoor = mainInputs[i].getBoundingClientRect();
 
